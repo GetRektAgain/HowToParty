@@ -14,7 +14,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "howtoparty.db";
     public static final int DB_VERSION = 1;
 
-    public static final String TABLE_NAME = "users";
+    public static String TABLE_NAME;
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_USERNAME = "username";
     public static final String COLUMN_PASSWORD = "password";
@@ -23,23 +23,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_BDDATE = "bd_date";
 
-    public static final String SQL_CREATE_USERS =
-            "CREATE TABLE " + TABLE_NAME + " (" +
-                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_USERNAME + " TEXT NOT NULL, " +
-                    COLUMN_PASSWORD + " TEXT NOT NULL, " +
-                    COLUMN_VNAME + " TEXT NOT NULL, " +
-                    COLUMN_NNAME + " TEXT NOT NULL, " +
-                    COLUMN_EMAIL + " TEXT NOT NULL, " +
-                    COLUMN_BDDATE + " TEXT NOT NULL);";
-
-    public DatabaseHelper(@Nullable Context context) {
+    public DatabaseHelper(@Nullable Context context, String tableName) {
         super(context, DB_NAME, null, DB_VERSION);
+        TABLE_NAME = tableName;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_USERS);
+        String executable = this.getDbExecuatable();
+        if (TABLE_NAME.equals("users")) {
+            db.execSQL(executable);
+        }
     }
 
     @Override
@@ -85,5 +79,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         @SuppressLint("Recycle") Cursor data = db.rawQuery(sql, null);
         return data.getCount() == 0;
+    }
+
+    public String getDbExecuatable() {
+        if (TABLE_NAME.equals("users")) {
+            return "CREATE TABLE " + TABLE_NAME + " (" +
+                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_USERNAME + " TEXT NOT NULL, " +
+                    COLUMN_PASSWORD + " TEXT NOT NULL, " +
+                    COLUMN_VNAME + " TEXT NOT NULL, " +
+                    COLUMN_NNAME + " TEXT NOT NULL, " +
+                    COLUMN_EMAIL + " TEXT NOT NULL, " +
+                    COLUMN_BDDATE + " TEXT NOT NULL);";
+        } else
+        return null;
     }
 }

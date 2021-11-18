@@ -28,7 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        db = new DatabaseHelper(this);
+        db = new DatabaseHelper(this, "users");
 
         btnRegister = (Button) findViewById(R.id.btnSaveRegister);
         regUsername = (EditText) findViewById(R.id.regUsername);
@@ -68,6 +68,11 @@ public class RegisterActivity extends AppCompatActivity {
         if (!password.equals(passwordWdh)) {
             canBeSaved = false;
             regErrorText.setText("Das Passwort stimmt nicht überein");
+        }
+
+        if (username.equals("") || vname.equals("") || nname.equals("") || email.equals("") || password.equals("")) {
+            canBeSaved = false;
+            regErrorText.setText("Bitte Füllen Sie alle Felder aus");
         }
 
         if (canBeSaved) {
