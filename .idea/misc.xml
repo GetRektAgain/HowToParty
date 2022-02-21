@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/HowToParty/app/src/main/res/layout/activity_login.xml" value="0.1707193515704154" />
+        <entry key="..\:/HowToParty/app/src/main/res/layout/activity_maps.xml" value="0.1" />
+        <entry key="..\:/HowToParty/app/src/main/res/layout/activity_register.xml" value="0.1707193515704154" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.335" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.15070921985815602" />
         <entry key="app/src/main/res/layout/activity_register.xml" value="0.335" />
