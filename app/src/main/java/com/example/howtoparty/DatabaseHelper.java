@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -11,20 +12,18 @@ import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.sql.Array;
-
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "howtoparty.db";
     public static final int DB_VERSION = 3;
 
     public static String TABLE_NAME;
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_USERNAME = "username";
-    public static final String COLUMN_PASSWORD = "password";
-    public static final String COLUMN_VNAME = "vname";
-    public static final String COLUMN_NNAME = "nname";
-    public static final String COLUMN_EMAIL = "email";
+    public static final String COLUMN_ID = "ID";
+    public static final String COLUMN_USERNAME = "Username";
+    public static final String COLUMN_PASSWORD = "Password";
+    public static final String COLUMN_VNAME = "vName";
+    public static final String COLUMN_NNAME = "nName";
+    public static final String COLUMN_EMAIL = "Email";
     public static final String COLUMN_BDDATE = "bd_date";
     public static final String COLUMN_LAT = "latitude";
     public static final String COLUMN_LON = "longitude";
@@ -46,14 +45,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String[] executables = this.getDbExecuatable();
         String[] dropExecutables = this.getDbTableDropExecuatable();
+
         for (String dropExecutable: dropExecutables) {
-            db.execSQL(dropExecutable);
+            try{
+                db.execSQL(dropExecutable);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        for (String executable: executables ) {
-            db.execSQL(executable);
-        }
+        onCreate(db);
     }
 
     @SuppressLint("Recycle")
@@ -69,7 +70,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
 
-        return data.getCount() == 1;
+        boolean bReturn;
+        if (data != null) {
+            bReturn =  data.getCount() == 1;
+        }
+        else
+        {
+            bReturn = false;
+        }
+
+        return bReturn;
     }
 
     public void addUser (String username, String passwort, String vname, String nname, String email, String bddate) {
@@ -83,8 +93,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_EMAIL, email);
         values.put(COLUMN_BDDATE, bddate);
 
-        long id = db.insert(TABLE_NAME, null, values);
-
+        db.insert(TABLE_NAME, null, values);
+        db.close();
     }
 
     public void addParty (LatLng position, String musikrichtung) {
@@ -139,7 +149,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String[] getDbTableDropExecuatable() {
-        String[] dropExecuatable = new String[1];
+        String[] dropExecuatable = new String[2];
         dropExecuatable[0] = "DROP TABLE users";
         dropExecuatable[1] = "DROP TABLE partys";
         return dropExecuatable;
