@@ -27,7 +27,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_BDDATE = "bd_date";
     public static final String COLUMN_LAT = "latitude";
     public static final String COLUMN_LON = "longitude";
-    public static final String COLUMN_MUSIKR = "musikrichtung";
+    public static final String COLUMN_VERANSTALTUNGSART = "veranstaltungs_art";
+    public static final String COLUMN_VERANSTALTUNGSBECHREIBUNG = "veranstaltungs_beschreibung";
+    public static final String COLUMN_IMAGE = "image_data";
     public static final String COLUMN_TEILNEHMER = "teilnehmer";
 
     public DatabaseHelper(@Nullable Context context, String tableName) {
@@ -94,16 +96,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_BDDATE, bddate);
 
         db.insert(TABLE_NAME, null, values);
-        db.close();
     }
 
-    public void addParty (LatLng position, String musikrichtung) {
+    public void addParty (LatLng position, String Veranstaltungsart, String VeranstaltungsBeschreibung, byte[] image ) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(COLUMN_LAT, position.latitude);
         values.put(COLUMN_LON, position.longitude);
-        values.put(COLUMN_MUSIKR, musikrichtung);
+        values.put(COLUMN_VERANSTALTUNGSART, Veranstaltungsart);
+        values.put(COLUMN_VERANSTALTUNGSBECHREIBUNG, VeranstaltungsBeschreibung);
+        values.put(COLUMN_IMAGE, image);
 
         db.insert(TABLE_NAME, null, values);
     }
@@ -143,7 +146,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_LAT + " DOUBLE NOT NULL, " +
                 COLUMN_LON + " DOUBLE NOT NULL, " +
-                COLUMN_MUSIKR + " TEXT NOT NULL);";
+                COLUMN_VERANSTALTUNGSART + " TEXT NOT NULL," +
+                COLUMN_VERANSTALTUNGSBECHREIBUNG + " TEXT NOT NULL," +
+                COLUMN_IMAGE + " BLOB);";
 
         return execuatable;
     }
