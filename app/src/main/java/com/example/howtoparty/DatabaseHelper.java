@@ -98,7 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_NAME, null, values);
     }
 
-    public void addParty (LatLng position, String Veranstaltungsart, String VeranstaltungsBeschreibung, byte[] image ) {
+    public void addParty (LatLng position, String Veranstaltungsart, String VeranstaltungsBeschreibung, byte[] image) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -107,6 +107,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_VERANSTALTUNGSART, Veranstaltungsart);
         values.put(COLUMN_VERANSTALTUNGSBECHREIBUNG, VeranstaltungsBeschreibung);
         values.put(COLUMN_IMAGE, image);
+
+        db.insert(TABLE_NAME, null, values);
+    }
+
+    public void addParty (LatLng position, String Veranstaltungsart, String VeranstaltungsBeschreibung) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_LAT, position.latitude);
+        values.put(COLUMN_LON, position.longitude);
+        values.put(COLUMN_VERANSTALTUNGSART, Veranstaltungsart);
+        values.put(COLUMN_VERANSTALTUNGSBECHREIBUNG, VeranstaltungsBeschreibung);
+        values.put(COLUMN_IMAGE, 0);
 
         db.insert(TABLE_NAME, null, values);
     }

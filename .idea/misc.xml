@@ -7,8 +7,9 @@
         <entry key="..\:/HowToParty/app/src/main/res/layout/activity_maps.xml" value="0.1" />
         <entry key="..\:/HowToParty/app/src/main/res/layout/activity_party_overview.xml" value="0.16" />
         <entry key="..\:/HowToParty/app/src/main/res/layout/activity_register.xml" value="0.22" />
-        <entry key="..\:/HowToParty/app/src/main/res/layout/activity_register_party.xml" value="0.33" />
-        <!--         <entry key="..\:/HowToParty/app/src/main/res/layout/content_main.xml" value="0.15425531914893617" /> -->
+        <entry key="..\:/HowToParty/app/src/main/res/layout/activity_register_party.xml" value="0.22" />
+        <entry key="..\:/HowToParty/app/src/main/res/layout/content_main.xml" value="0.15425531914893617" />
+        <entry key="..\:/HowToParty/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.335" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.15070921985815602" />
         <entry key="app/src/main/res/layout/activity_register.xml" value="0.335" />

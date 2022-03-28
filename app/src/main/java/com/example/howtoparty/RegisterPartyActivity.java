@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -93,10 +95,22 @@ public class RegisterPartyActivity extends AppCompatActivity {
                 Intent intent = new Intent(RegisterPartyActivity.this, MapsActivity.class);
                 startActivity(intent);
                 MapsActivity mapFragment=new MapsActivity();
-                dbPartys.addParty(position, textVeranstaltungsart.getText().toString(), textBeschreibung.getText().toString(),getBytes(ImageVeranstaltung));
+
+                if(ImageVeranstaltung == null){
+                Drawable drawable = ImageVeranstaltInsideApp.getDrawable();
+                ImageVeranstaltung = scaleDown(Bitmap.createBitmap(
+                        ImageVeranstaltInsideApp.getHeight(),ImageVeranstaltInsideApp.getWidth(), Bitmap.Config.ARGB_8888),128, false);
+                Canvas canvas = new Canvas(ImageVeranstaltung);
+                drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                drawable.draw(canvas);
+                }
+                dbPartys.addParty(position, textVeranstaltungsart.getText().toString(), textBeschreibung.getText().toString(), getBytes(ImageVeranstaltung));
+
             }
         });
     }
+
+
 
     // convert from bitmap to byte array
     public static byte[] getBytes(Bitmap bitmap) {
@@ -113,8 +127,8 @@ public class RegisterPartyActivity extends AppCompatActivity {
             InputStream is = null;
             try {
                 is = getContentResolver().openInputStream(data.getData());
-                ImageVeranstaltung = scaleDown(BitmapFactory.decodeStream(is, null, options),128,false );
-                ImageVeranstaltInsideApp.setImageBitmap(ImageVeranstaltung);
+                    ImageVeranstaltung = scaleDown(BitmapFactory.decodeStream(is, null, options), 128, false);
+                    ImageVeranstaltInsideApp.setImageBitmap(ImageVeranstaltung);
             } catch (IOException e) {
                 e.printStackTrace();
             }
