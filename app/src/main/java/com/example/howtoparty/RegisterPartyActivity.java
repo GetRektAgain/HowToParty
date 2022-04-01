@@ -31,6 +31,7 @@ public class RegisterPartyActivity extends AppCompatActivity {
     private EditText textBeschreibung;
     private Bitmap ImageVeranstaltung;
     private ImageView ImageVeranstaltInsideApp;
+    private int userId;
     DatabaseHelper dbPartys = new DatabaseHelper(this, "partys");
     public static final int PICK_IMAGE = 1;
 
@@ -48,6 +49,7 @@ public class RegisterPartyActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         LatLng position = intent.getParcelableExtra("position");
+        userId = intent.getIntExtra("userId", 0);
 
 
         btnBildAuswählen.setOnClickListener(new View.OnClickListener() {
@@ -104,7 +106,7 @@ public class RegisterPartyActivity extends AppCompatActivity {
                 drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
                 drawable.draw(canvas);
                 }
-                dbPartys.addParty(position, textVeranstaltungsart.getText().toString(), textBeschreibung.getText().toString(), getBytes(ImageVeranstaltung));
+                dbPartys.addParty(position, textVeranstaltungsart.getText().toString(), textBeschreibung.getText().toString(), getBytes(ImageVeranstaltung), userId);
 
             }
         });

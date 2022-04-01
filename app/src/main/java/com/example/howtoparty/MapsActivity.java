@@ -41,6 +41,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
     private static Marker registrationMarker;
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 100;
+    private int userId;
 
 
     @Override
@@ -103,6 +104,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         mMap = googleMap;
         DatabaseHelper db = new DatabaseHelper(this, "partys");
 
+        Intent intent = getIntent();
+        userId = intent.getIntExtra("userId", 0);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -144,13 +148,20 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
                   @Override
                   public void onInfoWindowClick(Marker marker) {
                       Object tag = marker.getTag();
-                   //TODO OpenDescription window
+                      Bundle bundle = new Bundle();
+                      assert tag != null;
+                      bundle.putInt("id", ((Integer) tag).intValue());
+                      bundle.putInt("userId", userId);
+                      Intent intent = new Intent(MapsActivity.this, PartyOverviewActivity.class);
+                      intent.putExtras(bundle);
+                      startActivity(intent);
                   }
         });
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener(){
                 public void onMapLongClick(LatLng point) {
                         Bundle bundle = new Bundle();
+                        bundle.putInt("userId", userId);
                         bundle.putParcelable("position", point);
                         Intent intent = new Intent(MapsActivity.this, RegisterPartyActivity.class);
                         intent.putExtras(bundle);
