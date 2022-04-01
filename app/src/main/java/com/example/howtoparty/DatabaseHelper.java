@@ -15,7 +15,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "howtoparty.db";
-    public static final int DB_VERSION = 3;
+    public static final int DB_VERSION = 5;
 
     public static String TABLE_NAME;
     public static final String COLUMN_ID = "ID";
@@ -31,6 +31,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_VERANSTALTUNGSBECHREIBUNG = "veranstaltungs_beschreibung";
     public static final String COLUMN_IMAGE = "image_data";
     public static final String COLUMN_TEILNEHMER = "teilnehmer";
+    public static final String COLUMN_PARTYID = "partyId";
+    public static final String COLUMN_USERID = "userId";
+    public static final String COLUMN_ORGANIZER = "veranstalter";
 
     public DatabaseHelper(@Nullable Context context, String tableName) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -60,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Recycle")
-    public boolean isLoginSuccessful (String userUsername, String passwort) {
+    public Cursor isLoginSuccessful (String userUsername, String passwort) {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor data = null;
 
@@ -72,16 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
 
-        boolean bReturn;
-        if (data != null) {
-            bReturn =  data.getCount() == 1;
-        }
-        else
-        {
-            bReturn = false;
-        }
-
-        return bReturn;
+        return data;
     }
 
     public void addUser (String username, String passwort, String vname, String nname, String email, String bddate) {
@@ -98,7 +92,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_NAME, null, values);
     }
 
-    public void addParty (LatLng position, String Veranstaltungsart, String VeranstaltungsBeschreibung, byte[] image) {
+    public void addParty (LatLng position, String Veranstaltungsart, String VeranstaltungsBeschreibung, byte[] image, int organizerId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -107,6 +101,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_VERANSTALTUNGSART, Veranstaltungsart);
         values.put(COLUMN_VERANSTALTUNGSBECHREIBUNG, VeranstaltungsBeschreibung);
         values.put(COLUMN_IMAGE, image);
+        values.put(COLUMN_ORGANIZER, organizerId);
 
         db.insert(TABLE_NAME, null, values);
     }
@@ -124,6 +119,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_NAME, null, values);
     }
 
+    public void addAttendent (int userId, int partyId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PARTYID, partyId);
+        values.put(COLUMN_USERID, userId);
+        db.insert("teilnehmer", null, values);
+    }
+
+    public boolean isAttendent(int userId,int partyId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String sql = "SELECT * FROM teilnehmer WHERE " + COLUMN_USERID +
+                " = " + userId + " AND " + COLUMN_PARTYID +
+                " = " + partyId + ";";
+        Cursor result = db.rawQuery(sql, null);
+        int count = result.getCount();
+        return count != 0;
+    }
+
+    public boolean isOrganizer(int userId, int partyId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String sql = "SELECT * FROM partys " +
+                "WHERE id = " + partyId +
+                " AND " + COLUMN_ORGANIZER + " = " + userId + ";";
+        Cursor result = db.rawQuery(sql, null);
+        int count = result.getCount();
+        return  count != 0;
+    }
+
     public Cursor getPartys () {
         SQLiteDatabase db = this.getWritableDatabase();
         String sql = "SELECT * FROM partys";
@@ -133,6 +157,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getParty (int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         String sql = "SELECT * FROM partys WHERE id = "+ id;
+        return db.rawQuery(sql, null);
+    }
+
+    public Cursor getAttendantsForParty (int partyId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String sql = "SELECT * FROM teilnehmer WHERE " +
+                COLUMN_PARTYID + " = " + partyId + ";";
         return db.rawQuery(sql, null);
     }
 
@@ -146,7 +177,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public String[] getDbExecuatable() {
-        String[] execuatable = new String[2];
+        String[] execuatable = new String[3];
         execuatable[0] = "CREATE TABLE users (" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_USERNAME + " TEXT NOT NULL, " +
@@ -161,7 +192,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_LON + " DOUBLE NOT NULL, " +
                 COLUMN_VERANSTALTUNGSART + " TEXT NOT NULL," +
                 COLUMN_VERANSTALTUNGSBECHREIBUNG + " TEXT NOT NULL," +
-                COLUMN_IMAGE + " BLOB);";
+                COLUMN_IMAGE + " BLOB, " +
+                COLUMN_ORGANIZER + " INTEGER NOT NULL);";
+        execuatable[2] = "CREATE TABLE teilnehmer (" +
+                COLUMN_PARTYID + " INTEGER NOT NULL, " +
+                COLUMN_USERID + " INTEGER NOT NULL);";
 
         return execuatable;
     }
