@@ -29,6 +29,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements LocationListener, OnMapReadyCallback{
@@ -102,7 +104,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
      */
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        DatabaseHelper db = new DatabaseHelper(this, "partys");
+        DatabaseHelper db = new DatabaseHelper();
 
         Intent intent = getIntent();
         userId = intent.getIntExtra("userId", 0);
@@ -120,28 +122,27 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         mMap.setMyLocationEnabled(true);
 
         first = 0;
-        Cursor partys = db.getPartys();
-        int countPartys = partys.getCount();
-        partys.moveToFirst();
-        for (int i = 0; i < countPartys; i++) {
-            int id = partys.getInt(0);
-            double lat = partys.getDouble(1);
-            double lng = partys.getDouble(2);
-            String Veranstaltungsart = partys.getString(3);
-            String VeranstaltungsBeschreibung = partys.getString(4);
-            Bitmap Image = getImage(partys.getBlob(5));
-            BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(Image);
-
-            LatLng partyMarker = new LatLng(lat, lng);
-            MarkerOptions markerOptions = new MarkerOptions().position(partyMarker)
-                    .title(Veranstaltungsart)
-                    .snippet(VeranstaltungsBeschreibung)
-                    .icon(icon);
-            mMap.addMarker(markerOptions).setTag(id);
-
-            //TODO CREATE DESCRITION WINDOW WITH PARTY DESCRIBTION
-            //TODO ADD PICTURE TO DESCRIPTION WINDOW
-            partys.moveToNext();
+        ResultSet partys = db.getPartys();
+        while (true) {
+            try {
+                if (partys.next()) break;
+                int id = partys.getInt("id");
+                double lat = partys.getDouble("latitude");
+                double lng = partys.getDouble("longitude");
+                String veranstaltungsart = partys.getString("veranstaltungs_art");
+                String veranstaltungsBeschreibung = partys.getString("veranstaltungs_beschreibung");
+                //TODO Julian muss Syntax überprüfen Blob aus db byte[] bei funktion
+//                Bitmap image = getImage(partys.getBlob(6));
+//                BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(image);
+                LatLng partyMarker = new LatLng(lat, lng);
+                MarkerOptions markerOptions = new MarkerOptions().position(partyMarker)
+                        .title(veranstaltungsart)
+                        .snippet(veranstaltungsBeschreibung);
+//                        .icon(icon);
+                mMap.addMarker(markerOptions).setTag(id);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
