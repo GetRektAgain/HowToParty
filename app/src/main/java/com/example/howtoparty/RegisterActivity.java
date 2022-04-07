@@ -10,6 +10,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.sql.SQLException;
+
 public class RegisterActivity extends AppCompatActivity {
 
     public DatabaseHelper db;
@@ -28,7 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        db = new DatabaseHelper(this, "users");
+        db = new DatabaseHelper();
 
         btnRegister = (Button) findViewById(R.id.btnSaveRegister);
         regUsername = (EditText) findViewById(R.id.regUsername);
@@ -43,20 +45,24 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveNewUser(
-                        regUsername.getText().toString(),
-                        regVname.getText().toString(),
-                        regNname.getText().toString(),
-                        regEmail.getText().toString(),
-                        regBddate.getText().toString(),
-                        regPassword.getText().toString(),
-                        regPasswordWdh.getText().toString()
-                );
+                try {
+                    saveNewUser(
+                            regUsername.getText().toString(),
+                            regVname.getText().toString(),
+                            regNname.getText().toString(),
+                            regEmail.getText().toString(),
+                            regBddate.getText().toString(),
+                            regPassword.getText().toString(),
+                            regPasswordWdh.getText().toString()
+                    );
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         });
     }
 
-    private void saveNewUser(String username, String vname, String nname, String email, String dbdate, String password, String passwordWdh) {
+    private void saveNewUser(String username, String vname, String nname, String email, String dbdate, String password, String passwordWdh) throws SQLException {
         boolean canBeSaved = true;
 
         boolean validUsername = db.validateUsername(username);

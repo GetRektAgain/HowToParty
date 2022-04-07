@@ -32,7 +32,7 @@ public class RegisterPartyActivity extends AppCompatActivity {
     private Bitmap ImageVeranstaltung;
     private ImageView ImageVeranstaltInsideApp;
     private int userId;
-    DatabaseHelper dbPartys = new DatabaseHelper(this, "partys");
+    DatabaseHelper dbPartys = new DatabaseHelper();
     public static final int PICK_IMAGE = 1;
 
     @Override

@@ -10,6 +10,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class PartyOverviewActivity extends AppCompatActivity {
 
     private TextView txtId;
@@ -27,20 +30,27 @@ public class PartyOverviewActivity extends AppCompatActivity {
         btnBack = (Button) findViewById(R.id.btnBack);
         btnTeilnehmen = (Button) findViewById(R.id.btnTeilnehmen);
 
-        db = new DatabaseHelper(this, "partys");
+        db = new DatabaseHelper();
 
         Intent intent = getIntent();
         int id = intent.getIntExtra("id", 0);
         userId = intent.getIntExtra("userId", 0);
 
-        this.checkAttendant(userId, id);
-        boolean isOrganizer = this.checkOrganizer(userId, id);
+        try {
+            this.checkAttendant(userId, id);
+            this.checkOrganizer(userId, id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-        Cursor result = db.getParty(id);
-        result.moveToFirst();
-        double posLat = result.getDouble(1);
-        double posLng = result.getDouble(2);
-        String musikRichtung = result.getString(3);
+        ResultSet result = db.getParty(id);
+        String musikRichtung = "";
+        try {
+            result.next();
+            musikRichtung = result.getString("veranstaltungs_art");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
 
         txtId.setText(musikRichtung);
 
@@ -59,12 +69,16 @@ public class PartyOverviewActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 db.addAttendent(userId, id);
-                checkAttendant(userId, id);
+                try {
+                    checkAttendant(userId, id);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    private void checkAttendant(int userId, int partyId) {
+    private void checkAttendant(int userId, int partyId) throws SQLException {
         if (db.isAttendent(userId, partyId)) {
             btnTeilnehmen.setClickable(false);
             btnTeilnehmen.setText("Teilgenommen");
@@ -72,7 +86,7 @@ public class PartyOverviewActivity extends AppCompatActivity {
         }
     }
 
-    private boolean checkOrganizer(int userId, int partyId) {
+    private boolean checkOrganizer(int userId, int partyId) throws SQLException {
         boolean check = db.isOrganizer(userId, partyId);
         if (check) {
             btnTeilnehmen.setText("Bearbeiten");

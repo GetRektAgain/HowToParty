@@ -13,6 +13,11 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.xml.transform.Result;
+
 public class LoginActivity extends AppCompatActivity {
 
     public DatabaseHelper db;
@@ -28,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         checkPermission();
 
-        db = new DatabaseHelper(this, "users");
+        db = new DatabaseHelper();
 
         loginUsername = (EditText) findViewById(R.id.LoginUsername);
         loginPassword = (EditText) findViewById(R.id.LoginPassword);
@@ -39,7 +44,13 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                login(loginUsername.getText().toString(), loginPassword.getText().toString());
+                try {
+                    login(loginUsername.getText().toString(), loginPassword.getText().toString());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         });
 
@@ -52,13 +63,12 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void login(String username, String password) {
-        Cursor successful = db.isLoginSuccessful(username, password);
-        successful.moveToFirst();
-        if (successful.getCount() != 0) {
+    private void login(String username, String password) throws InterruptedException, SQLException {
+        ResultSet successful = db.isLoginSuccessful(username, password);
+        if (successful.next()) {
             if (successful.getString(2).equals(password)) {
                 Bundle bundle = new Bundle();
-                bundle.putInt("userId", successful.getInt(0));
+                bundle.putInt("userId", successful.getInt(1));
                 Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
