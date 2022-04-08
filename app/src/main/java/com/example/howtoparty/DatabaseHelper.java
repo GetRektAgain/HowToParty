@@ -1,15 +1,8 @@
 package com.example.howtoparty;
 
 import android.annotation.SuppressLint;
-import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 
-import androidx.annotation.Nullable;
-
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.sql.Connection;
@@ -27,14 +20,14 @@ public class DatabaseHelper {
     public static Cursor a;
 
     @SuppressLint("Recycle")
-    public ResultSet isLoginSuccessful (String userUsername, String passwort) {
+    public ResultSet isLoginSuccessful (String username, String passwort) {
         new Thread(() -> {
             try {
                 Class.forName("com.mysql.jdbc.Driver");
                 Connection con = DriverManager.getConnection(url, user, pass);
                 Statement st = null;
                 st = con.createStatement();
-                resultSet = st.executeQuery("SELECT * FROM users WHERE username = '" + userUsername +
+                resultSet = st.executeQuery("SELECT * FROM users WHERE username = '" + username +
                         "' AND password = '" + passwort + "';");
             } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
@@ -57,13 +50,13 @@ public class DatabaseHelper {
                 Class.forName("com.mysql.jdbc.Driver");
                 Connection con = DriverManager.getConnection(url, user, pass);
                 Statement st = con.createStatement();
-                st.executeQuery("INSERT INTO users (username, password, vName, nName, email, bd_date) VALUES (" +
-                        username +", " +
-                        passwort +", " +
-                        vname + ", " +
-                        nname + ", " +
-                        email + ", " +
-                        bddate + ")");
+                st.execute("INSERT INTO users (username, password, vName, nName, email, bd_date) VALUES ('"+
+                       username + "', " +
+                       passwort +"', '" +
+                       vname + "', '" +
+                       nname + "', '" +
+                       email + "', '" +
+                       bddate +  "');" );
             } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
             }
@@ -71,27 +64,23 @@ public class DatabaseHelper {
         }).start();
     }
 
-    public void addParty (LatLng position, String veranstaltungsart, String veranstaltungsBeschreibung, byte[] image, int organizerId) {
+    public void addParty (LatLng position, String veranstaltungsart, String veranstaltungsBeschreibung, String image, int organizerId) {
         new Thread(() -> {
             try {
                 Class.forName("com.mysql.jdbc.Driver");
                 Connection con = DriverManager.getConnection(url, user, pass);
                 Statement st = con.createStatement();
-                st.executeQuery("INSERT INTO partys (latitude, longitude, veranstaltungs_art, veranstaltungs_beschreibung, image, veranstalter) VALUES (" +
-                        position.latitude +", " +
-                        position.longitude +", " +
-                        veranstaltungsart +", " +
-                        veranstaltungsBeschreibung +", " +
-                        image +", " +
-                        organizerId +");");
+                st.execute("INSERT INTO partys (latitude, longitude, veranstaltungs_art, veranstaltungs_beschreibung, image, veranstalter) VALUES ('" +
+                        position.latitude +"', '" +
+                        position.longitude +"', '" +
+                        veranstaltungsart +"', '" +
+                        veranstaltungsBeschreibung +"', '" +
+                        image +"', '" +
+                        organizerId +"');");
             } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
             }
         }).start();
-    }
-
-    public void addParty (LatLng position, String Veranstaltungsart, String VeranstaltungsBeschreibung) {
-
     }
 
     public void addAttendent (int userId, int partyId) {
@@ -100,9 +89,9 @@ public class DatabaseHelper {
                 Class.forName("com.mysql.jdbc.Driver");
                 Connection con = DriverManager.getConnection(url, user, pass);
                 Statement st = con.createStatement();
-                st.executeQuery("INSERT INTO teilnehmer (partyId, userId) VALUES (" +
-                        partyId +", " +
-                        userId +");");
+                st.execute("INSERT INTO teilnehmer (partyId, userId) VALUES ('" +
+                        partyId +"', '" +
+                        userId +"');");
             } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
             }
@@ -154,12 +143,14 @@ public class DatabaseHelper {
     }
 
     public ResultSet getPartys () {
+        resultSet = null;
         new Thread(() -> {
             try {
                 Class.forName("com.mysql.jdbc.Driver");
                 Connection con = DriverManager.getConnection(url, user, pass);
                 Statement st = con.createStatement();
-                resultSet = st.executeQuery("SELECT * FROM partys;");
+                ResultSet ka = st.executeQuery("SELECT * FROM partys;");
+                resultSet = ka;
             } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
             }
@@ -205,7 +196,7 @@ public class DatabaseHelper {
                 Class.forName("com.mysql.jdbc.Driver");
                 Connection con = DriverManager.getConnection(url, user, pass);
                 Statement st = con.createStatement();
-                resultSet = st.executeQuery("SELECT * FROM users WHERE username = "+ username +";");
+                resultSet = st.executeQuery("SELECT * FROM users WHERE username = '"+ username +"';");
             } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
             }

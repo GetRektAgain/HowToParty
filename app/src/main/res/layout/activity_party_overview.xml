@@ -20,13 +20,14 @@
 
     <TextView
         android:id="@+id/txtId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="119dp"
+        android:layout_height="28dp"
         android:text="TextView"
         app:layout_constraintBottom_toTopOf="@+id/btnBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.06" />
 
     <Button
         android:id="@+id/btnTeilnehmen"
@@ -39,5 +40,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtId"
         app:layout_constraintVertical_bias="0.881" />
+
+    <TextView
+        android:id="@+id/textView_beschreibung"
+        android:layout_width="321dp"
+        android:layout_height="213dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.461" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

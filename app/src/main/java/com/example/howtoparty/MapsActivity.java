@@ -4,15 +4,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Base64;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -31,7 +30,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements LocationListener, OnMapReadyCallback{
 
@@ -44,7 +42,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 100;
     private int userId;
-
+    boolean Success;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,26 +121,48 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
 
         first = 0;
         ResultSet partys = db.getPartys();
-        while (true) {
-            try {
-                if (partys.next()) break;
-                int id = partys.getInt("id");
-                double lat = partys.getDouble("latitude");
-                double lng = partys.getDouble("longitude");
-                String veranstaltungsart = partys.getString("veranstaltungs_art");
-                String veranstaltungsBeschreibung = partys.getString("veranstaltungs_beschreibung");
-                //TODO Julian muss Syntax überprüfen Blob aus db byte[] bei funktion
-//                Bitmap image = getImage(partys.getBlob(6));
-//                BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(image);
-                LatLng partyMarker = new LatLng(lat, lng);
-                MarkerOptions markerOptions = new MarkerOptions().position(partyMarker)
-                        .title(veranstaltungsart)
-                        .snippet(veranstaltungsBeschreibung);
-//                        .icon(icon);
-                mMap.addMarker(markerOptions).setTag(id);
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+
+        try {
+            Success = partys.next();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        while(Success) {
+        try {
+            int id = partys.getInt("id");
+            double lat = partys.getDouble("latitude");
+            double lng = partys.getDouble("longitude");
+            String veranstaltungsart = partys.getString("veranstaltungs_art");
+            String veranstaltungsBeschreibung = partys.getString("veranstaltungs_beschreibung");
+            String blob = partys.getString("image");
+
+
+            Bitmap bitmap = StringToBitMap(blob);
+
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmap);
+            LatLng partyMarker = new LatLng(lat, lng);
+            MarkerOptions markerOptions;
+
+
+            if (icon == null )
+            {
+                 markerOptions = new MarkerOptions().position(partyMarker)
+                        .title(veranstaltungsart);
             }
+            else
+            {
+                 markerOptions = new MarkerOptions().position(partyMarker)
+                        .title(veranstaltungsart)
+                        .icon(icon);
+            }
+
+            mMap.addMarker(markerOptions).setTag(id);
+
+            Success = partys.next();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
         }
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
@@ -172,6 +192,17 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
     }
 
 
+    public Bitmap StringToBitMap(String encodedString){
+        try {
+            byte [] encodeByte= Base64.decode(encodedString,Base64.DEFAULT);
+            Bitmap bitmap=BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch(Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
+
     // convert from byte array to bitmap
     public static Bitmap getImage(byte[] image) {
         return BitmapFactory.decodeByteArray(image, 0, image.length);
@@ -183,11 +214,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener, 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
         mMap.animateCamera(cameraUpdate);
         locationManager.removeUpdates(this);
-    }
-
-    @Override
-    public void onLocationChanged(@NonNull List<Location> locations) {
-        LocationListener.super.onLocationChanged(locations);
     }
 
     @Override

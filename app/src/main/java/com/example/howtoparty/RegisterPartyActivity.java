@@ -8,12 +8,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -92,11 +95,11 @@ public class RegisterPartyActivity extends AppCompatActivity {
         });
 
         btnRegistrieren.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RegisterPartyActivity.this, MapsActivity.class);
                 startActivity(intent);
-                MapsActivity mapFragment=new MapsActivity();
 
                 if(ImageVeranstaltung == null){
                 Drawable drawable = ImageVeranstaltInsideApp.getDrawable();
@@ -106,21 +109,22 @@ public class RegisterPartyActivity extends AppCompatActivity {
                 drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
                 drawable.draw(canvas);
                 }
-                dbPartys.addParty(position, textVeranstaltungsart.getText().toString(), textBeschreibung.getText().toString(), getBytes(ImageVeranstaltung), userId);
 
+                String str = BitMapToString(ImageVeranstaltung);
+                dbPartys.addParty(position, textVeranstaltungsart.getText().toString(), textBeschreibung.getText().toString(), str, userId);
             }
         });
     }
 
 
 
-    // convert from bitmap to byte array
-    public static byte[] getBytes(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
-        return stream.toByteArray();
+    public String BitMapToString(Bitmap bitmap){
+        ByteArrayOutputStream baos=new  ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
+        byte [] b=baos.toByteArray();
+        String temp= Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

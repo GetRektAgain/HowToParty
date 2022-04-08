@@ -1,14 +1,12 @@
 package com.example.howtoparty;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +16,7 @@ public class PartyOverviewActivity extends AppCompatActivity {
     private TextView txtId;
     private Button btnBack;
     private Button btnTeilnehmen;
+    private TextView txtDesc;
     private DatabaseHelper db;
     private int userId;
 
@@ -29,30 +28,39 @@ public class PartyOverviewActivity extends AppCompatActivity {
         txtId = (TextView) findViewById(R.id.txtId);
         btnBack = (Button) findViewById(R.id.btnBack);
         btnTeilnehmen = (Button) findViewById(R.id.btnTeilnehmen);
+        txtDesc = (TextView) findViewById(R.id.textView_beschreibung);
 
         db = new DatabaseHelper();
 
         Intent intent = getIntent();
         int id = intent.getIntExtra("id", 0);
-        userId = intent.getIntExtra("userId", 0);
+        userId = intent.getIntExtra("userId",0);
+
 
         try {
-            this.checkAttendant(userId, id);
-            this.checkOrganizer(userId, id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        ResultSet result = db.getParty(id);
-        String musikRichtung = "";
-        try {
-            result.next();
-            musikRichtung = result.getString("veranstaltungs_art");
+            checkAttendant(userId, id);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
 
-        txtId.setText(musikRichtung);
+        try {
+            checkOrganizer(userId, id);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+
+        ResultSet result = db.getParty(id);
+
+        try {
+            result.first();
+            txtId.setText(result.getString("veranstaltungs_art"));
+            txtDesc.setText(result.getString("veranstaltungs_beschreibung"));
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,6 +97,7 @@ public class PartyOverviewActivity extends AppCompatActivity {
     private boolean checkOrganizer(int userId, int partyId) throws SQLException {
         boolean check = db.isOrganizer(userId, partyId);
         if (check) {
+            btnTeilnehmen.setClickable(false);
             btnTeilnehmen.setText("Bearbeiten");
             btnTeilnehmen.setBackgroundTintList(btnTeilnehmen.getResources().getColorStateList(R.color.blue, this.getTheme()));
         }

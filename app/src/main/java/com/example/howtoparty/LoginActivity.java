@@ -3,7 +3,6 @@ package com.example.howtoparty;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -15,8 +14,6 @@ import androidx.core.app.ActivityCompat;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import javax.xml.transform.Result;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -65,8 +62,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private void login(String username, String password) throws InterruptedException, SQLException {
         ResultSet successful = db.isLoginSuccessful(username, password);
-        if (successful.next()) {
-            if (successful.getString(2).equals(password)) {
+        if (successful.first()) {
+            if (successful.getString("password").equals(password)) {
                 Bundle bundle = new Bundle();
                 bundle.putInt("userId", successful.getInt(1));
                 Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
